@@ -23,8 +23,6 @@ class Program
 
         Console.WriteLine("App started successfully!");
 
-        //string connectionString = "Server=.\\SQLEXPRESS;Database=StudentDB;Trusted_Connection=True;Encrypt=False;";
-        //StudentRepository repo = new StudentRepository(connectionString);
         bool replay = true;
         while (replay)
         {
