@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Channels;
-using Microsoft.Data.SqlClient;
-using Student_Management_System.Data;
+﻿using Student_Management_System.Data;
 using Student_Management_System.Models;
 class Program
 {
@@ -21,8 +18,8 @@ class Program
             Console.WriteLine("5. Delete Student");
             Console.WriteLine("6. Exit");
             Console.Write("Choice: ");
-            string SChoice = Console.ReadLine();
-            if (!int.TryParse(SChoice, out int choice) || choice < 1 || choice > 6)
+            string choiceInput = Console.ReadLine();
+            if (!int.TryParse(choiceInput, out int choice) || choice < 1 || choice > 6)
             {
                 Console.WriteLine("============================");
                 Console.WriteLine("Invalid Choice");
@@ -30,21 +27,20 @@ class Program
             }
             else
             {
-                int Choice = choice;
                     Console.WriteLine("============================\n\n");
-                    switch (Choice)
+                    switch (choice)
                     {
                         //ADD STUDENT
                         case 1:
                             Console.WriteLine("============================");
                             Console.WriteLine("Add Student");
-                            Student s = new Student();
+                            Student student = new Student();
                             //NAME
                             while (true)
                             {
                                 Console.Write("Name: ");
-                                s.Name = Console.ReadLine();
-                                if (!string.IsNullOrEmpty(s.Name) && !string.IsNullOrWhiteSpace(s.Name))
+                                student.Name = Console.ReadLine();
+                                if (!string.IsNullOrEmpty(student.Name) && !string.IsNullOrWhiteSpace(student.Name))
                                     break;
                                 else
                                     Console.WriteLine("Invalid Input");
@@ -53,10 +49,10 @@ class Program
                             while (true)
                             {
                                 Console.Write("Age: ");
-                                string age = Console.ReadLine();
-                                if (int.TryParse(age, out int agee))
+                                string ageInput = Console.ReadLine();
+                                if (int.TryParse(ageInput, out int age))
                                 {
-                                    s.Age = agee;
+                                    student.Age = age;
                                     break;
                                 }
                                 else
@@ -69,8 +65,8 @@ class Program
                             while (true)
                             {
                                 Console.Write("Course: ");
-                                s.Course = Console.ReadLine();
-                                if (!string.IsNullOrEmpty(s.Course) && !string.IsNullOrWhiteSpace(s.Course))
+                                student.Course = Console.ReadLine();
+                                if (!string.IsNullOrEmpty(student.Course) && !string.IsNullOrWhiteSpace(student.Course))
                                     break;
                                 else
                                     Console.WriteLine("Invalid Input");
@@ -80,10 +76,10 @@ class Program
                             {
 
                                 Console.Write("Year Level: ");
-                                string year = Console.ReadLine();
-                                if (int.TryParse(year, out int yearr) && yearr >= 1 && yearr <= 4)
+                                string yearLevelInput = Console.ReadLine();
+                                if (int.TryParse(yearLevelInput, out int yearLevel) && yearLevel >= 1 && yearLevel <= 4)
                                 {
-                                    s.YearLevel = yearr;
+                                    student.YearLevel = yearLevel;
                                     break;
                                 }
                                 else
@@ -91,7 +87,7 @@ class Program
                                     Console.WriteLine("Invalid Input");
                                 }
                             }
-                            repo.AddStudent(s);
+                            repo.AddStudent(student);
                             Console.WriteLine("Student Add Successfully");
                             Console.WriteLine("============================\n\n");
                             break;
@@ -100,14 +96,14 @@ class Program
                             Console.WriteLine("============================");
                             Console.WriteLine("Check Students");
                             List<Student> All = repo.GetAllStudents();
-                            foreach (Student ss in All)
+                            foreach (Student students in All)
                             {
                                 Console.WriteLine("============================");
-                                Console.WriteLine("ID" + ss.StudentID);
-                                Console.WriteLine("Name: " + ss.Name);
-                                Console.WriteLine("Age: " + ss.Age);
-                                Console.WriteLine("Course: " + ss.Course);
-                                Console.WriteLine("Year Level: " + ss.YearLevel);
+                                Console.WriteLine("ID" + students.StudentID);
+                                Console.WriteLine("Name: " + students.Name);
+                                Console.WriteLine("Age: " + students.Age);
+                                Console.WriteLine("Course: " + students.Course);
+                                Console.WriteLine("Year Level: " + students.YearLevel);
                                 Console.WriteLine("============================\n\n");
                             }
                             break;
@@ -117,18 +113,18 @@ class Program
                             Console.WriteLine("============================");
                             Console.WriteLine("Search Student Using Name");
                             Console.Write("Name: ");
-                            string SearchName = Console.ReadLine();
-                            List<Student> SearchStudent = repo.SearchStudentByName(SearchName);
+                            string searchNameInput = Console.ReadLine();
+                            List<Student> SearchStudent = repo.SearchStudentByName(searchNameInput);
                             if (SearchStudent.Count > 0)
                             {
-                                foreach (Student ss in SearchStudent)
+                                foreach (Student students in SearchStudent)
                                 {
                                     Console.WriteLine("============================");
-                                    Console.WriteLine("ID" + ss.StudentID);
-                                    Console.WriteLine("Name: " + ss.Name);
-                                    Console.WriteLine("Age: " + ss.Age);
-                                    Console.WriteLine("Course: " + ss.Course);
-                                    Console.WriteLine("Year Level: " + ss.YearLevel);
+                                    Console.WriteLine("ID" + students.StudentID);
+                                    Console.WriteLine("Name: " + students.Name);
+                                    Console.WriteLine("Age: " + students.Age);
+                                    Console.WriteLine("Course: " + students.Course);
+                                    Console.WriteLine("Year Level: " + students.YearLevel);
                                     Console.WriteLine("============================\n\n");
                                 }
                             }
@@ -142,16 +138,16 @@ class Program
                         case 4:
                             Console.WriteLine("============================");
                             Console.WriteLine("Update Student");
-                            Student sss = new Student();
+                            Student updateStudent = new Student();
                             //ID
                             while (true)
                             {
                                 Console.Write("Student ID: ");
-                                string ID = Console.ReadLine();
-                                if (int.TryParse(ID, out int IDD))
+                                string idInput = Console.ReadLine();
+                                if (int.TryParse(idInput, out int id))
                                 {
-                                    sss.StudentID = IDD;
-                                    if (!repo.StudentExists(sss.StudentID))
+                                updateStudent.StudentID = id;
+                                    if (!repo.StudentExists(updateStudent.StudentID))
                                 {
                                         Console.WriteLine("Student ID Does Not Exist");
                                     }
@@ -168,8 +164,8 @@ class Program
                             while (true)
                             {
                                 Console.Write("Name: ");
-                                sss.Name = Console.ReadLine();
-                                if (!string.IsNullOrEmpty(sss.Name) && !string.IsNullOrWhiteSpace(sss.Name))
+                            updateStudent.Name = Console.ReadLine();
+                                if (!string.IsNullOrEmpty(updateStudent.Name) && !string.IsNullOrWhiteSpace(updateStudent.Name))
                                     break;
                                 else
                                     Console.WriteLine("Invalid Input");
@@ -178,10 +174,10 @@ class Program
                             while (true)
                             {
                                 Console.Write("Age: ");
-                                string age = Console.ReadLine();
-                                if (int.TryParse(age, out int agee))
+                                string ageInput = Console.ReadLine();
+                                if (int.TryParse(ageInput, out int age))
                                 {
-                                    sss.Age = agee;
+                                    updateStudent.Age = age;
                                     break;
                                 }
                                 else
@@ -194,8 +190,8 @@ class Program
                             while (true)
                             {
                                 Console.Write("Course: ");
-                                sss.Course = Console.ReadLine();
-                                if (!string.IsNullOrEmpty(sss.Course) && !string.IsNullOrWhiteSpace(sss.Course))
+                            updateStudent.Course = Console.ReadLine();
+                                if (!string.IsNullOrEmpty(updateStudent.Course) && !string.IsNullOrWhiteSpace(updateStudent.Course))
                                     break;
                                 else
                                     Console.WriteLine("Invalid Input");
@@ -205,10 +201,10 @@ class Program
                             {
 
                                 Console.Write("Year Level: ");
-                                string year = Console.ReadLine();
-                                if (int.TryParse(year, out int yearr) && yearr >= 1 && yearr <= 4)
+                                string yearInput = Console.ReadLine();
+                                if (int.TryParse(yearInput, out int year) && year >= 1 && year <= 4)
                             {
-                                    sss.YearLevel = yearr;
+                                updateStudent.YearLevel = year;
                                     break;
                                 }
                                 else
@@ -216,7 +212,7 @@ class Program
                                     Console.WriteLine("Invalid Input");
                                 }
                             }
-                            repo.UpdateStudent(sss);
+                            repo.UpdateStudent(updateStudent);
                             Console.WriteLine("Student Update Successfully");
                             Console.WriteLine("============================\n\n");
 
@@ -229,14 +225,13 @@ class Program
                                 Console.WriteLine("Delete Student");
                                 Console.WriteLine("Students You Want To Delete");
                                 Console.Write("ID: ");
-                                string IDDD = Console.ReadLine();
-                                if (int.TryParse(IDDD, out int IDDDr))
+                                string idInput = Console.ReadLine();
+                                if (int.TryParse(idInput, out int id))
                                 {
-                                    int IDDDD = IDDDr;
-                                    if (repo.StudentExists(IDDDD))
+                                    if (repo.StudentExists(id))
                                     {
-                                        repo.DeleteStudent(IDDDD);
-                                        Console.WriteLine("Student ID" + IDDD + " Has Been Deleted");
+                                        repo.DeleteStudent(id);
+                                        Console.WriteLine("Student ID" + id + " Has Been Deleted");
                                         break;
                                     }
                                     else

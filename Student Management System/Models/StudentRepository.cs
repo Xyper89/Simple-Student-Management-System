@@ -1,7 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using Student_Management_System.Models;
-using System;
-using System.Collections.Generic;
 
 namespace Student_Management_System.Data
 {
@@ -17,7 +15,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 1 CREATE
         // -------------------
-        public void AddStudent(Student s)
+        public void AddStudent(Student addStudent)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -26,10 +24,10 @@ namespace Student_Management_System.Data
                     "VALUES(@Name, @Age, @Course, @YearLevel)";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Name", s.Name);
-                    cmd.Parameters.AddWithValue("@Age", s.Age);
-                    cmd.Parameters.AddWithValue("@Course", s.Course);
-                    cmd.Parameters.AddWithValue("@YearLevel", s.YearLevel);
+                    cmd.Parameters.AddWithValue("@Name", addStudent.Name);
+                    cmd.Parameters.AddWithValue("@Age", addStudent.Age);
+                    cmd.Parameters.AddWithValue("@Course", addStudent.Course);
+                    cmd.Parameters.AddWithValue("@YearLevel", addStudent.YearLevel);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -69,7 +67,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 3 READ / SEARCH (By Name)
         // -------------------
-        public List<Student> SearchStudentByName(string name)
+        public List<Student> SearchStudentByName(string searchStudentName)
         {
             List<Student> students = new List<Student>();
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -79,7 +77,7 @@ namespace Student_Management_System.Data
                                "FROM Students WHERE Name LIKE @Name";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Name", "%" + name + "%");
+                    cmd.Parameters.AddWithValue("@Name", "%" + searchStudentName + "%");
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -103,7 +101,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 4 UPDATE
         // -------------------
-        public void UpdateStudent(Student s)
+        public void UpdateStudent(Student updateStudent)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -112,11 +110,11 @@ namespace Student_Management_System.Data
                                "WHERE StudentID=@StudentID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Name", s.Name);
-                    cmd.Parameters.AddWithValue("@Age", s.Age);
-                    cmd.Parameters.AddWithValue("@Course", s.Course);
-                    cmd.Parameters.AddWithValue("@YearLevel", s.YearLevel);
-                    cmd.Parameters.AddWithValue("@StudentID", s.StudentID);
+                    cmd.Parameters.AddWithValue("@Name", updateStudent.Name);
+                    cmd.Parameters.AddWithValue("@Age", updateStudent.Age);
+                    cmd.Parameters.AddWithValue("@Course", updateStudent.Course);
+                    cmd.Parameters.AddWithValue("@YearLevel", updateStudent.YearLevel);
+                    cmd.Parameters.AddWithValue("@StudentID", updateStudent.StudentID);
 
                     cmd.ExecuteNonQuery();
                 }
@@ -126,7 +124,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 5 DELETE
         // -------------------
-        public void DeleteStudent(int studentID)
+        public void DeleteStudent(int studentId)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -134,7 +132,7 @@ namespace Student_Management_System.Data
                 string query = "DELETE FROM Students WHERE StudentID=@StudentID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@StudentID", studentID);
+                    cmd.Parameters.AddWithValue("@StudentID", studentId);
                     cmd.ExecuteNonQuery();
                 }
             }
