@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Student_Management_System.Models;
 
+
 namespace Student_Management_System.Data
 {
     public class StudentRepository

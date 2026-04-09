@@ -1,11 +1,28 @@
 ﻿using Student_Management_System.Data;
 using Student_Management_System.Models;
+using Microsoft.Extensions.Configuration;
 class Program
 {
     static void Main()
     {
-        string connectionString = "Server=.\\SQLEXPRESS;Database=StudentDB;Trusted_Connection=True;Encrypt=False;";
+        var builder = new ConfigurationBuilder()
+          .SetBasePath(Directory.GetCurrentDirectory())
+          .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+        IConfiguration config = builder.Build();
+
+        string connectionString = config.GetConnectionString("DefaultConnection");
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            Console.WriteLine("Database configuration missing.");
+            return;
+        }
+
         StudentRepository repo = new StudentRepository(connectionString);
+
+        Console.WriteLine("App started successfully!");
+
         bool replay = true;
         while (replay)
         {
