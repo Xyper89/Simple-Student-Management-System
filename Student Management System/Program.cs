@@ -167,13 +167,13 @@ class Program
         while (true)
         {
             Console.Write(promt);
-            string input = Console.ReadLine();
-            if (!string.IsNullOrEmpty(input))
+            string input = Console.ReadLine().Trim();
+
+            if (!string.IsNullOrWhiteSpace(input))
             {
                 return input;
-
-                Console.WriteLine("Input Is Required. Please Try Again.");
             }
+                Console.WriteLine("Input Is Required. Please Try Again.");
         }
     }
     static int ReadIntInRange(string prompt, int min, int max)
