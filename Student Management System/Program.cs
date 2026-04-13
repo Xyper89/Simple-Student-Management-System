@@ -1,10 +1,6 @@
-﻿using Azure.Core;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Student_Management_System.Data;
 using Student_Management_System.Models;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Threading.Channels;
 class Program
 {
     static void Main()
@@ -57,7 +53,6 @@ class Program
                         student.YearLevel = ReadIntInRange("Year Level: ", 1, 4);
                     try
                     {
-                        throw new Exception("Test crash");
                         if (repo.AddStudent(student))
                         {
                             Console.WriteLine("Student Added Successfully");
