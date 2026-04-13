@@ -53,8 +53,13 @@ class Program
                         student.Course = ReadRequiredText("Course: ");
                         //YEAR LEVEL
                         student.YearLevel = ReadIntInRange("Year Level: ", 1, 4);
-                        repo.AddStudent(student);
-                        Console.WriteLine("Student Add Successfully");
+                    if (repo.AddStudent(student))
+                    {
+                        Console.WriteLine("Student Added Successfully");
+                    }
+                    else
+                        Console.WriteLine("Failed To Student");
+
                         Console.WriteLine("============================\n\n");
                         break;
                     //CHECK STUDENT
@@ -126,37 +131,50 @@ class Program
                             updateStudent.Course = ReadRequiredText("Course: ");
                         //YEAR LEVEL
                                 updateStudent.YearLevel = ReadIntInRange("Year Level: ", 1, 4);
-                        repo.UpdateStudent(updateStudent);
+                    if (repo.UpdateStudent(updateStudent))
+                    {
                         Console.WriteLine("Student Update Successfully");
+                    }
+                    else
+                        Console.WriteLine("Student Failed To Update");
+
                         Console.WriteLine("============================\n\n");
 
                         break;
-                    //DELETE STUDENT
+                     //DELETE STUDENT
                     case 5:
                         while (true)
                         {
                             Console.WriteLine("============================");
                             Console.WriteLine("Delete Student");
                             Console.WriteLine("Students You Want To Delete");
+
                             int id = ReadPositiveInt("ID: ");
-                                if (repo.StudentExists(id))
-                                {
-                                    repo.DeleteStudent(id);
-                                    Console.WriteLine("Student ID" + id + " Has Been Deleted");
-                                    break;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Student ID Does Not Exist");
-                                }
+
+                            if (!repo.StudentExists(id))
+                            {
+                                Console.WriteLine("Student ID Does Not Exist");
+                                continue;
+                            }
+
+                            if (repo.DeleteStudent(id))
+                            {
+                                Console.WriteLine("Student ID " + id + " Has Been Deleted");
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Failed to delete student");
+                            }
                         }
                         break;
+                    //QUIT
                     case 6:
-                        Console.WriteLine("============================");
-                        Console.WriteLine("Thank You For Using The Student Management System!");
-                        Console.WriteLine("============================");
-                        replay = false;
-                        break;
+                            Console.WriteLine("============================");
+                            Console.WriteLine("Thank You For Using The Student Management System!");
+                            Console.WriteLine("============================");
+                            replay = false;
+                            break;
                 }
         }
     }

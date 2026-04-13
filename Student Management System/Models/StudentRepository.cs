@@ -16,7 +16,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 1 CREATE
         // -------------------
-        public void AddStudent(Student addStudent)
+        public bool AddStudent(Student addStudent)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -29,7 +29,8 @@ namespace Student_Management_System.Data
                     cmd.Parameters.AddWithValue("@Age", addStudent.Age);
                     cmd.Parameters.AddWithValue("@Course", addStudent.Course);
                     cmd.Parameters.AddWithValue("@YearLevel", addStudent.YearLevel);
-                    cmd.ExecuteNonQuery();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
                 }
             }
         }
@@ -102,7 +103,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 4 UPDATE
         // -------------------
-        public void UpdateStudent(Student updateStudent)
+        public bool UpdateStudent(Student updateStudent)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -116,8 +117,8 @@ namespace Student_Management_System.Data
                     cmd.Parameters.AddWithValue("@Course", updateStudent.Course);
                     cmd.Parameters.AddWithValue("@YearLevel", updateStudent.YearLevel);
                     cmd.Parameters.AddWithValue("@StudentID", updateStudent.StudentID);
-
-                    cmd.ExecuteNonQuery();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
                 }
             }
         }
@@ -125,7 +126,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 5 DELETE
         // -------------------
-        public void DeleteStudent(int studentId)
+        public bool DeleteStudent(int studentId)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -134,7 +135,8 @@ namespace Student_Management_System.Data
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@StudentID", studentId);
-                    cmd.ExecuteNonQuery();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
                 }
             }
         }
