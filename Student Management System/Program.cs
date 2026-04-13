@@ -1,6 +1,8 @@
 ﻿using Student_Management_System.Data;
 using Student_Management_System.Models;
 using Microsoft.Extensions.Configuration;
+using Azure.Core;
+using System.Threading.Channels;
 class Program
 {
     static void Main()
@@ -34,86 +36,53 @@ class Program
             Console.WriteLine("4. Update Student");
             Console.WriteLine("5. Delete Student");
             Console.WriteLine("6. Exit");
-            Console.Write("Choice: ");
-            string choiceInput = Console.ReadLine();
-            if (!int.TryParse(choiceInput, out int choice) || choice < 1 || choice > 6)
-            {
-                Console.WriteLine("============================");
-                Console.WriteLine("Invalid Choice");
-                continue;
-            }
-            else
-            {
-                    Console.WriteLine("============================\n\n");
-                    switch (choice)
-                    {
-                        //ADD STUDENT
-                        case 1:
+            int choice = ReadIntInRange("Choice: ", 1, 6);
+                Console.WriteLine("============================\n\n");
+                switch (choice)
+                {
+                    //ADD STUDENT
+                    case 1:
+                        Console.WriteLine("============================");
+                        Console.WriteLine("Add Student");
+                        Student student = new Student();
+                        //NAME
+                        student.Name = ReadRequiredText("Name: ");
+                        //AGE
+                        student.Age = ReadPositiveInt("Age: ");
+                        //COURSE
+                        student.Course = ReadRequiredText("Course: ");
+                        //YEAR LEVEL
+                        student.YearLevel = ReadIntInRange("Year Level: ", 1, 4);
+                        repo.AddStudent(student);
+                        Console.WriteLine("Student Add Successfully");
+                        Console.WriteLine("============================\n\n");
+                        break;
+                    //CHECK STUDENT
+                    case 2:
+                        Console.WriteLine("============================");
+                        Console.WriteLine("Check Students");
+                        List<Student> All = repo.GetAllStudents();
+                        foreach (Student students in All)
+                        {
                             Console.WriteLine("============================");
-                            Console.WriteLine("Add Student");
-                            Student student = new Student();
-                            //NAME
-                            while (true)
-                            {
-                                Console.Write("Name: ");
-                                student.Name = Console.ReadLine();
-                                if (!string.IsNullOrEmpty(student.Name) && !string.IsNullOrWhiteSpace(student.Name))
-                                    break;
-                                else
-                                    Console.WriteLine("Invalid Input");
-                            }
-                            //AGE
-                            while (true)
-                            {
-                                Console.Write("Age: ");
-                                string ageInput = Console.ReadLine();
-                                if (int.TryParse(ageInput, out int age))
-                                {
-                                    student.Age = age;
-                                    break;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Invalid Input");
-
-                                }
-                            }
-                            //COURSE
-                            while (true)
-                            {
-                                Console.Write("Course: ");
-                                student.Course = Console.ReadLine();
-                                if (!string.IsNullOrEmpty(student.Course) && !string.IsNullOrWhiteSpace(student.Course))
-                                    break;
-                                else
-                                    Console.WriteLine("Invalid Input");
-                            }
-                            //YEAR LEVEL
-                            while (true)
-                            {
-
-                                Console.Write("Year Level: ");
-                                string yearLevelInput = Console.ReadLine();
-                                if (int.TryParse(yearLevelInput, out int yearLevel) && yearLevel >= 1 && yearLevel <= 4)
-                                {
-                                    student.YearLevel = yearLevel;
-                                    break;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Invalid Input");
-                                }
-                            }
-                            repo.AddStudent(student);
-                            Console.WriteLine("Student Add Successfully");
+                            Console.WriteLine("ID" + students.StudentID);
+                            Console.WriteLine("Name: " + students.Name);
+                            Console.WriteLine("Age: " + students.Age);
+                            Console.WriteLine("Course: " + students.Course);
+                            Console.WriteLine("Year Level: " + students.YearLevel);
                             Console.WriteLine("============================\n\n");
-                            break;
-                        //CHECK STUDENT
-                        case 2:
-                            Console.WriteLine("============================");
-                            Console.WriteLine("Check Students");
-                            List<Student> All = repo.GetAllStudents();
-                            foreach (Student students in All)
+                        }
+                        break;
+                    //SEARCH STUDENT
+                    case 3:
+
+                        Console.WriteLine("============================");
+                        Console.WriteLine("Search Student Using Name");
+                        string searchNameInput = ReadRequiredText("Name: ");
+                        List<Student> SearchStudent = repo.SearchStudentByName(searchNameInput);
+                        if (SearchStudent.Count > 0)
+                        {
+                            foreach (Student students in SearchStudent)
                             {
                                 Console.WriteLine("============================");
                                 Console.WriteLine("ID" + students.StudentID);
@@ -123,154 +92,113 @@ class Program
                                 Console.WriteLine("Year Level: " + students.YearLevel);
                                 Console.WriteLine("============================\n\n");
                             }
-                            break;
-                        //SEARCH STUDENT
-                        case 3:
+                        }
+                        else
+                        {
+                            Console.WriteLine("No Student Found!");
+                        }
 
-                            Console.WriteLine("============================");
-                            Console.WriteLine("Search Student Using Name");
-                            Console.Write("Name: ");
-                            string searchNameInput = Console.ReadLine();
-                            List<Student> SearchStudent = repo.SearchStudentByName(searchNameInput);
-                            if (SearchStudent.Count > 0)
-                            {
-                                foreach (Student students in SearchStudent)
-                                {
-                                    Console.WriteLine("============================");
-                                    Console.WriteLine("ID" + students.StudentID);
-                                    Console.WriteLine("Name: " + students.Name);
-                                    Console.WriteLine("Age: " + students.Age);
-                                    Console.WriteLine("Course: " + students.Course);
-                                    Console.WriteLine("Year Level: " + students.YearLevel);
-                                    Console.WriteLine("============================\n\n");
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("No Student Found!");
-                            }
+                        break;
+                    //UPDATE STUDENT
+                    case 4:
+                        Console.WriteLine("============================");
+                        Console.WriteLine("Update Student");
+                        Student updateStudent = new Student();
+                        //ID
+                        while (true)
+                        {
+                            int id = ReadPositiveInt("Student ID: ");
 
-                            break;
-                        //UPDATE STUDENT
-                        case 4:
-                            Console.WriteLine("============================");
-                            Console.WriteLine("Update Student");
-                            Student updateStudent = new Student();
-                            //ID
-                            while (true)
+                            if (repo.StudentExists(id))
                             {
-                                Console.Write("Student ID: ");
-                                string idInput = Console.ReadLine();
-                                if (int.TryParse(idInput, out int id))
-                                {
                                 updateStudent.StudentID = id;
-                                    if (!repo.StudentExists(updateStudent.StudentID))
-                                {
-                                        Console.WriteLine("Student ID Does Not Exist");
-                                    }
-                                    else
-                                        break;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Invalid Input");
+                                break;
+                            }
 
-                                }
-                            }
-                            //NAME
-                            while (true)
-                            {
-                                Console.Write("Name: ");
-                            updateStudent.Name = Console.ReadLine();
-                                if (!string.IsNullOrEmpty(updateStudent.Name) && !string.IsNullOrWhiteSpace(updateStudent.Name))
-                                    break;
-                                else
-                                    Console.WriteLine("Invalid Input");
-                            }
-                            //AGE
-                            while (true)
-                            {
-                                Console.Write("Age: ");
-                                string ageInput = Console.ReadLine();
-                                if (int.TryParse(ageInput, out int age))
-                                {
-                                    updateStudent.Age = age;
-                                    break;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Invalid Input");
+                            Console.WriteLine("Student ID Does Not Exist");
+                        }
 
-                                }
-                            }
-                            //COURSE
-                            while (true)
-                            {
-                                Console.Write("Course: ");
-                            updateStudent.Course = Console.ReadLine();
-                                if (!string.IsNullOrEmpty(updateStudent.Course) && !string.IsNullOrWhiteSpace(updateStudent.Course))
-                                    break;
-                                else
-                                    Console.WriteLine("Invalid Input");
-                            }
-                            //YEAR LEVEL
-                            while (true)
-                            {
+                        //NAME
+                        updateStudent.Name = ReadRequiredText("Name: ");
+                        //AGE
+                                updateStudent.Age = ReadIntInRange("Age: ",18,100);
+                        //COURSE
+                            updateStudent.Course = ReadRequiredText("Course: ");
+                        //YEAR LEVEL
+                                updateStudent.YearLevel = ReadIntInRange("Year Level: ", 1, 4);
+                        repo.UpdateStudent(updateStudent);
+                        Console.WriteLine("Student Update Successfully");
+                        Console.WriteLine("============================\n\n");
 
-                                Console.Write("Year Level: ");
-                                string yearInput = Console.ReadLine();
-                                if (int.TryParse(yearInput, out int year) && year >= 1 && year <= 4)
-                            {
-                                updateStudent.YearLevel = year;
-                                    break;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Invalid Input");
-                                }
-                            }
-                            repo.UpdateStudent(updateStudent);
-                            Console.WriteLine("Student Update Successfully");
-                            Console.WriteLine("============================\n\n");
-
-                            break;
-                        //DELETE STUDENT
-                        case 5:
-                            while (true)
-                            {
-                                Console.WriteLine("============================");
-                                Console.WriteLine("Delete Student");
-                                Console.WriteLine("Students You Want To Delete");
-                                Console.Write("ID: ");
-                                string idInput = Console.ReadLine();
-                                if (int.TryParse(idInput, out int id))
-                                {
-                                    if (repo.StudentExists(id))
-                                    {
-                                        repo.DeleteStudent(id);
-                                        Console.WriteLine("Student ID" + id + " Has Been Deleted");
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Student ID Does Not Exist");
-                                    }
-                                }
-
-                                else
-                                {
-                                    Console.WriteLine("Invalid Input");
-                                }
-                            }
-                            break;
-                        case 6:
+                        break;
+                    //DELETE STUDENT
+                    case 5:
+                        while (true)
+                        {
                             Console.WriteLine("============================");
-                            Console.WriteLine("Thank You For Using The Student Management System!");
-                            Console.WriteLine("============================");
-                            replay = false;
-                            break;
-                    }
+                            Console.WriteLine("Delete Student");
+                            Console.WriteLine("Students You Want To Delete");
+                            int id = ReadPositiveInt("ID: ");
+                                if (repo.StudentExists(id))
+                                {
+                                    repo.DeleteStudent(id);
+                                    Console.WriteLine("Student ID" + id + " Has Been Deleted");
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Student ID Does Not Exist");
+                                }
+                        }
+                        break;
+                    case 6:
+                        Console.WriteLine("============================");
+                        Console.WriteLine("Thank You For Using The Student Management System!");
+                        Console.WriteLine("============================");
+                        replay = false;
+                        break;
+                }
+        }
+    }
+
+    //INPUT HELPERS
+    static string ReadRequiredText(string promt)
+    {
+        while (true)
+        {
+            Console.Write(promt);
+            string input = Console.ReadLine().Trim();
+
+            if (!string.IsNullOrWhiteSpace(input))
+            {
+                return input;
             }
+                Console.WriteLine("Input Is Required. Please Try Again.");
+        }
+    }
+    static int ReadIntInRange(string prompt, int min, int max)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            string input = Console.ReadLine();
+            if (int.TryParse(input, out int value) && value >= min && value <= max)
+                return value;
+
+            Console.WriteLine($"Please Enter A Number Between {min} And {max}.");
+        }
+    }
+    static int ReadPositiveInt(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            string input = Console.ReadLine();
+
+            if (int.TryParse(input, out int value) && value > 0)
+                return value;
+
+            Console.WriteLine("Please enter a valid positive number.");
         }
     }
 }
