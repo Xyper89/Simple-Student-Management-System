@@ -11,7 +11,12 @@ class Program
 
         IConfiguration config = builder.Build();
 
-        string connectionString = config.GetConnectionString("DefaultConnection");
+        string? connectionString = config.GetConnectionString("DefaultConnection");
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new Exception("Connection string 'DefaultConnection' is missing.");
+        }
 
         if (string.IsNullOrEmpty(connectionString))
         {
@@ -35,22 +40,24 @@ class Program
             Console.WriteLine("5. Delete Student");
             Console.WriteLine("6. Exit");
             int choice = ReadIntInRange("Choice: ", 1, 6);
-                Console.WriteLine("============================\n\n");
-                switch (choice)
-                {
-                    //ADD STUDENT
-                    case 1:
-                        Console.WriteLine("============================");
-                        Console.WriteLine("Add Student");
-                        Student student = new Student();
+            Console.WriteLine("============================\n\n");
+            switch (choice)
+            {
+                //ADD STUDENT
+                case 1:
+                    Console.WriteLine("============================");
+                    Console.WriteLine("Add Student");
+                    Student student = new Student
+                    {
                         //NAME
-                        student.Name = ReadRequiredText("Name: ");
+                        Name = ReadRequiredText("Name: "),
                         //AGE
-                        student.Age = ReadPositiveInt("Age: ");
+                        Age = ReadPositiveInt("Age: "),
                         //COURSE
-                        student.Course = ReadRequiredText("Course: ");
+                        Course = ReadRequiredText("Course: "),
                         //YEAR LEVEL
-                        student.YearLevel = ReadIntInRange("Year Level: ", 1, 4);
+                        YearLevel = ReadIntInRange("Year Level: ", 1, 4)
+                    };
                     try
                     {
                         if (repo.AddStudent(student))
@@ -60,18 +67,18 @@ class Program
                         else
                             Console.WriteLine("Failed To Add Student");
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         Console.WriteLine("Something went wrong while adding the student. Please try again later.");
                         LogError(exception);
                         break;
                     }
-                        Console.WriteLine("============================\n\n");
-                        break;
-                    //CHECK STUDENT
-                    case 2:
-                        Console.WriteLine("============================");
-                        Console.WriteLine("Check Students");
+                    Console.WriteLine("============================\n\n");
+                    break;
+                //CHECK STUDENT
+                case 2:
+                    Console.WriteLine("============================");
+                    Console.WriteLine("Check Students");
                     try
                     {
                         List<Student> allStudents = repo.GetAllStudents();
@@ -86,19 +93,19 @@ class Program
                             Console.WriteLine("============================\n\n");
                         }
                     }
-                    catch(Exception exception) 
-                    { 
+                    catch (Exception exception)
+                    {
                         Console.WriteLine("We couldn't load the student list. Please try again later.");
                         LogError(exception);
                         break;
                     }
-                        break;
-                    //SEARCH STUDENT
-                    case 3:
+                    break;
+                //SEARCH STUDENT
+                case 3:
 
-                        Console.WriteLine("============================");
-                        Console.WriteLine("Search Student Using Name");
-                        string searchNameInput = ReadRequiredText("Name: ");
+                    Console.WriteLine("============================");
+                    Console.WriteLine("Search Student Using Name");
+                    string searchNameInput = ReadRequiredText("Name: ");
                     try
                     {
                         List<Student> SearchStudent = repo.SearchStudentByName(searchNameInput);
@@ -120,50 +127,69 @@ class Program
                             Console.WriteLine("No Student Found!");
                         }
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         Console.WriteLine("Something went wrong while searching for students. Please try again later.");
                         LogError(exception);
                         break;
                     }
-                        break;
-                    //UPDATE STUDENT
-                    case 4:
-                        Console.WriteLine("============================");
-                        Console.WriteLine("Update Student");
-                        Student updateStudent = new Student();
-                        //ID
-                        while (true)
+                    break;
+                //UPDATE STUDENT
+                case 4:
+                    Console.WriteLine("============================");
+                    Console.WriteLine("Update Student");
+                    int id = 0;
+                    //ID
+                    while (true)
+                    {
+                        id = ReadPositiveInt("Student ID: ");
+                        try
                         {
-                            int id = ReadPositiveInt("Student ID: ");
-
                             if (repo.StudentExists(id))
                             {
-                                updateStudent.StudentID = id;
                                 break;
                             }
-
-                            Console.WriteLine("Student ID Does Not Exist");
+                            else
+                                Console.WriteLine("Student id does not exist");
                         }
-
-                        //NAME
-                        updateStudent.Name = ReadRequiredText("Name: ");
-                        //AGE
-                                updateStudent.Age = ReadIntInRange("Age: ",18,100);
-                        //COURSE
-                            updateStudent.Course = ReadRequiredText("Course: ");
-                        //YEAR LEVEL
-                                updateStudent.YearLevel = ReadIntInRange("Year Level: ", 1, 4);
-                    if (repo.UpdateStudent(updateStudent))
-                    {
-                        Console.WriteLine("Student Update Successfully");
+                        catch (Exception exception)
+                        {
+                            Console.WriteLine("Something went wrong while checking of student id. Please try again later");
+                            LogError(exception);
+                            continue;
+                        }
                     }
-                    else
-                        Console.WriteLine("Student Failed To Update");
+                    string name = ReadRequiredText("Name: ");
+                    int age = ReadIntInRange("Age: ", 18, 100);
+                    string course = ReadRequiredText("Course: ");
+                    int yearLevel = ReadIntInRange("Year Level: ", 1, 4);
+                    Student updateStudent = new Student()
+                    {
+                        StudentID = id,
+                        Name = name,
+                        Age = age,
+                        Course = course,
+                        YearLevel = yearLevel
+                    };
+
+                    try
+                    {
+                        if (repo.UpdateStudent(updateStudent))
+                        {
+                            Console.WriteLine("Student Update Successfully");
+                        }
+                        else
+                            Console.WriteLine("Student Failed To Update");
 
                         Console.WriteLine("============================\n\n");
-
-                        break;
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine("Something went wrong on updating student. Please try again later.");
+                        LogError(exception);
+                    }
+                    break;
+            
                      //DELETE STUDENT
                     case 5:
                     while (true)
@@ -172,18 +198,18 @@ class Program
                         Console.WriteLine("Delete Student");
                         Console.WriteLine("Students You Want To Delete");
 
-                        int id = ReadPositiveInt("ID: ");
+                        int Id = ReadPositiveInt("ID: ");
                         try
                         {
-                            if (!repo.StudentExists(id))
+                            if (!repo.StudentExists(Id))
                             {
                                 Console.WriteLine("Student ID Does Not Exist");
                                 continue;
                             }
 
-                            if (repo.DeleteStudent(id))
+                            if (repo.DeleteStudent(Id))
                             {
-                                Console.WriteLine("Student ID " + id + " Has Been Deleted");
+                                Console.WriteLine("Student ID " + Id + " Has Been Deleted");
                                 break;
                             }
                             else
@@ -208,6 +234,7 @@ class Program
                             break;
                 }
         }
+
     }
 
     //INPUT HELPERS
@@ -216,7 +243,7 @@ class Program
         while (true)
         {
             Console.Write(promt);
-            string input = Console.ReadLine().Trim();
+            string input = (Console.ReadLine() ?? "").Trim();
 
             if (!string.IsNullOrWhiteSpace(input))
             {
@@ -230,7 +257,7 @@ class Program
         while (true)
         {
             Console.Write(prompt);
-            string input = Console.ReadLine();
+            string input = Console.ReadLine() ?? "";
             if (int.TryParse(input, out int value) && value >= min && value <= max)
                 return value;
 
@@ -242,7 +269,7 @@ class Program
         while (true)
         {
             Console.Write(prompt);
-            string input = Console.ReadLine();
+            string input = Console.ReadLine() ?? "";
 
             if (int.TryParse(input, out int value) && value > 0)
                 return value;
