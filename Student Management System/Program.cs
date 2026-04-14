@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Student_Management_System.Data;
 using Student_Management_System.Models;
+using Student_Management_System.utils;
+using Student_Management_System;
 class Program
 {
     static void Main()
@@ -23,8 +25,8 @@ class Program
             Console.WriteLine("Database configuration missing.");
             return;
         }
-
         StudentRepository repo = new StudentRepository(connectionString);
+        StudentService service = new StudentService(repo);
 
         Console.WriteLine("App started successfully!");
 
@@ -49,32 +51,22 @@ class Program
                     Console.WriteLine("Add Student");
                     Student student = new Student
                     {
-                        //NAME
                         Name = ReadRequiredText("Name: "),
-                        //AGE
                         Age = ReadPositiveInt("Age: "),
-                        //COURSE
                         Course = ReadRequiredText("Course: "),
-                        //YEAR LEVEL
                         YearLevel = ReadIntInRange("Year Level: ", 1, 4)
                     };
-                    try
+                    if (service.AddStudent(student, out string message))
                     {
-                        if (repo.AddStudent(student))
-                        {
-                            Console.WriteLine("Student Added Successfully");
-                        }
-                        else
-                            Console.WriteLine("Failed To Add Student");
+                        Console.WriteLine(message);
                     }
-                    catch (Exception exception)
+                    else
                     {
-                        Console.WriteLine("Something went wrong while adding the student. Please try again later.");
-                        LogError(exception);
-                        break;
+                        Console.WriteLine(message);
                     }
                     Console.WriteLine("============================\n\n");
                     break;
+
                 //CHECK STUDENT
                 case 2:
                     Console.WriteLine("============================");
@@ -96,7 +88,7 @@ class Program
                     catch (Exception exception)
                     {
                         Console.WriteLine("We couldn't load the student list. Please try again later.");
-                        LogError(exception);
+                        Logger.LogError(exception);
                         break;
                     }
                     break;
@@ -105,60 +97,36 @@ class Program
 
                     Console.WriteLine("============================");
                     Console.WriteLine("Search Student Using Name");
+
                     string searchNameInput = ReadRequiredText("Name: ");
-                    try
+
+                    var result = service.SearchStudentByName(searchNameInput);
+
+                    if (result.Success && result.Students.Count > 0)
                     {
-                        List<Student> SearchStudent = repo.SearchStudentByName(searchNameInput);
-                        if (SearchStudent.Count > 0)
+                        foreach (Student students in result.Students)
                         {
-                            foreach (Student students in SearchStudent)
-                            {
-                                Console.WriteLine("============================");
-                                Console.WriteLine("ID" + students.StudentID);
-                                Console.WriteLine("Name: " + students.Name);
-                                Console.WriteLine("Age: " + students.Age);
-                                Console.WriteLine("Course: " + students.Course);
-                                Console.WriteLine("Year Level: " + students.YearLevel);
-                                Console.WriteLine("============================\n\n");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("No Student Found!");
+                            Console.WriteLine("============================");
+                            Console.WriteLine("ID: " + students.StudentID);
+                            Console.WriteLine("Name: " + students.Name);
+                            Console.WriteLine("Age: " + students.Age);
+                            Console.WriteLine("Course: " + students.Course);
+                            Console.WriteLine("Year Level: " + students.YearLevel);
+                            Console.WriteLine("============================\n\n");
                         }
                     }
-                    catch (Exception exception)
+                    else
                     {
-                        Console.WriteLine("Something went wrong while searching for students. Please try again later.");
-                        LogError(exception);
-                        break;
+                        Console.WriteLine(result.Message);
                     }
                     break;
                 //UPDATE STUDENT
                 case 4:
                     Console.WriteLine("============================");
                     Console.WriteLine("Update Student");
-                    int id = 0;
-                    //ID
-                    while (true)
-                    {
-                        id = ReadPositiveInt("Student ID: ");
-                        try
-                        {
-                            if (repo.StudentExists(id))
-                            {
-                                break;
-                            }
-                            else
-                                Console.WriteLine("Student id does not exist");
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.WriteLine("Something went wrong while checking of student id. Please try again later");
-                            LogError(exception);
-                            continue;
-                        }
-                    }
+ 
+                    int id = ReadPositiveInt("Student ID: ");
+
                     string name = ReadRequiredText("Name: ");
                     int age = ReadIntInRange("Age: ", 18, 100);
                     string course = ReadRequiredText("Course: ");
@@ -171,67 +139,33 @@ class Program
                         Course = course,
                         YearLevel = yearLevel
                     };
+                    var results = service.UpdateStudent(updateStudent);
 
-                    try
-                    {
-                        if (repo.UpdateStudent(updateStudent))
-                        {
-                            Console.WriteLine("Student Update Successfully");
-                        }
-                        else
-                            Console.WriteLine("Student Failed To Update");
-
-                        Console.WriteLine("============================\n\n");
-                    }
-                    catch (Exception exception)
-                    {
-                        Console.WriteLine("Something went wrong on updating student. Please try again later.");
-                        LogError(exception);
-                    }
+                    Console.WriteLine(results.Message);
+                    Console.WriteLine("============================\n\n");
                     break;
             
                      //DELETE STUDENT
-                    case 5:
-                    while (true)
-                    {
-                        Console.WriteLine("============================");
-                        Console.WriteLine("Delete Student");
-                        Console.WriteLine("Students You Want To Delete");
+                case 5:
+                    Console.WriteLine("============================");
+                    Console.WriteLine("Delete Student");
+                    Console.WriteLine("Students You Want To Delete");
 
-                        int Id = ReadPositiveInt("ID: ");
-                        try
-                        {
-                            if (!repo.StudentExists(Id))
-                            {
-                                Console.WriteLine("Student ID Does Not Exist");
-                                continue;
-                            }
+                    int studentId = ReadPositiveInt("ID: ");
 
-                            if (repo.DeleteStudent(Id))
-                            {
-                                Console.WriteLine("Student ID " + Id + " Has Been Deleted");
-                                break;
-                            }
-                            else
-                            {
-                                Console.WriteLine("Failed to delete student");
-                            }
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.WriteLine("Something went wrong while deleting a student. Please try again later.");
-                            LogError(exception);
-                            break;
-                        }
-                        }
-                        break;
-                    //QUIT
-                    case 6:
-                            Console.WriteLine("============================");
-                            Console.WriteLine("Thank You For Using The Student Management System!");
-                            Console.WriteLine("============================");
-                            replay = false;
-                            break;
+                    var msg = service.DeleteStudent(studentId);
+
+                    Console.WriteLine(msg.Message);
+                    Console.WriteLine("============================\n\n");
+
+                    break;
+                //QUIT
+                case 6:
+                    Console.WriteLine("============================");
+                    Console.WriteLine("Thank You For Using The Student Management System!");
+                    Console.WriteLine("============================");
+                    replay = false;
+                    break;
                 }
         }
 
@@ -276,13 +210,5 @@ class Program
 
             Console.WriteLine("Please enter a valid positive number.");
         }
-    }
-    static void LogError(Exception ex)
-    {
-        string logFile = "error_log.txt";
-
-        string message = $"[{DateTime.Now}] {ex.Message}\n{ex.StackTrace}\n";
-
-        File.AppendAllText(logFile, message);
     }
 }
