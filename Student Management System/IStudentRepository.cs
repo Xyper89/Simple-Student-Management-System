@@ -1,4 +1,3 @@
-using Student_Management_System.Data;
 using Student_Management_System.Models;
 namespace Student_Management_System.Data
 {

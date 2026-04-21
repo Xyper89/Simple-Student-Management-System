@@ -1,7 +1,6 @@
 ﻿using Azure.Core;
 using Student_Management_System.Data;
 using Student_Management_System.Models;
-using Student_Management_System.utils;
 
 namespace Student_Management_System.utils
 {

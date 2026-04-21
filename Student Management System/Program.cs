@@ -2,7 +2,6 @@
 using Student_Management_System.Data;
 using Student_Management_System.Models;
 using Student_Management_System.utils;
-using Student_Management_System;
 class Program
 {
     static void Main()
