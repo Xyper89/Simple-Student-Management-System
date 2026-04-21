@@ -15,7 +15,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 1 CREATE
         // -------------------
-        public bool AddStudent(Student addStudent)
+        public virtual bool AddStudent(Student addStudent)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -36,7 +36,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 2 READ (All Students)
         // -------------------
-        public List<Student> GetAllStudents()
+        public virtual List<Student> GetAllStudents()
         {
             List<Student> students = new List<Student>();
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -68,7 +68,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 3 READ / SEARCH (By Name)
         // -------------------
-        public List<Student> SearchStudentByName(string searchStudentName)
+        public virtual List<Student> SearchStudentByName(string searchStudentName)
         {
             List<Student> students = new List<Student>();
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -102,7 +102,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 4 UPDATE
         // -------------------
-        public bool UpdateStudent(Student updateStudent)
+        public virtual bool UpdateStudent(Student updateStudent)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -125,7 +125,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 5 DELETE
         // -------------------
-        public bool DeleteStudent(int studentId)
+        public virtual bool DeleteStudent(int studentId)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -142,7 +142,7 @@ namespace Student_Management_System.Data
         // -------------------
         // 6 CHECK STUDENT IF STILL EXIST
         // -------------------
-        public bool StudentExists(int studentId)
+        public virtual bool StudentExists(int studentId)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
